@@ -1,35 +1,39 @@
 import React from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
-import { useLocation, useParams } from "react-router-dom";
-import models from "../../modelData/models";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 
-function TopBar() {
-  const location = useLocation();
-  const { userId } = useParams();
+import "./styles.css";
 
-  let contextText = "Photo Sharing App";
-
-  if (location.pathname.startsWith("/users/") && userId) {
-    const user = models.userModel(userId);
-    if (user) {
-      contextText = `${user.first_name} ${user.last_name}`;
-    }
-  }
-
-  if (location.pathname.startsWith("/photos/") && userId) {
-    const user = models.userModel(userId);
-    if (user) {
-      contextText = `Photos of ${user.first_name} ${user.last_name}`;
-    }
-  }
-
+/**
+ * Define TopBar, a React component of Project 4.
+ */
+function TopBar({ context, advancedFeature, setAdvancedFeature }) {
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography style={{ flexGrow: 1 }}>
+    <AppBar className="topbar-appBar" position="absolute">
+      <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h5" color="inherit">
           Nguyễn Bách Phúc
         </Typography>
-        <Typography>{contextText}</Typography>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={advancedFeature}
+                onChange={(e) => setAdvancedFeature(e.target.checked)}
+                style={{ color: "white" }}
+              />
+            }
+            label="Advanced"
+          />
+          <Typography variant="h5" color="inherit">
+            {context}
+          </Typography>
+        </div>
       </Toolbar>
     </AppBar>
   );

@@ -1,19 +1,42 @@
-import React from "react";
-import { List, ListItem, ListItemText } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import models from "../../modelData/models";
 
+import "./styles.css";
+import fetchModel from "../../lib/fetchModelData";
+
+/**
+ * Define UserList, a React component of Project 4.
+ */
 function UserList() {
-  const users = models.userListModel();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchModel("/user/list")
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.error("Error fetching user list:", err));
+  }, []);
 
   return (
-    <List>
-      {users.map((user) => (
-        <ListItem button key={user._id} component={Link} to={`/users/${user._id}`}>
-          <ListItemText primary={`${user.first_name} ${user.last_name}`} />
-        </ListItem>
-      ))}
-    </List>
+    <div>
+      <Typography variant="body1">User List:</Typography>
+      <List component="nav">
+        {users.map((item) => (
+          <React.Fragment key={item._id}>
+            <ListItem button component={Link} to={`/users/${item._id}`}>
+              <ListItemText primary={`${item.first_name} ${item.last_name}`} />
+            </ListItem>
+            <Divider />
+          </React.Fragment>
+        ))}
+      </List>
+    </div>
   );
 }
 

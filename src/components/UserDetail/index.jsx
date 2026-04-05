@@ -1,31 +1,63 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { Typography, Button } from "@mui/material";
-import models from "../../modelData/models";
+import React, { useState, useEffect } from "react";
+import { Typography, Card, CardContent, Button } from "@mui/material";
+import { Link, useParams } from "react-router-dom";
 
-function UserDetail() {
+import "./styles.css";
+import fetchModel from "../../lib/fetchModelData";
+
+/**
+ * Define UserDetail, a React component of Project 4.
+ */
+function UserDetail({ setTopBarContext }) {
   const { userId } = useParams();
-  const user = models.userModel(userId);
+  const [user, setUser] = useState(null);
 
-  if (!user) return <Typography>User not found</Typography>;
+  useEffect(() => {
+    let isMounted = true;
+    fetchModel(`/user/${userId}`)
+      .then((res) => {
+        if (isMounted) {
+          setUser(res.data);
+          if (setTopBarContext) {
+            setTopBarContext(`${res.data.first_name} ${res.data.last_name}`);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching user detail:", err));
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, setTopBarContext]);
+
+  if (!user) {
+    return <Typography>Loading user details...</Typography>;
+  }
 
   return (
-    <div>
-      <Typography variant="h5">
-        {user.first_name} {user.last_name}
-      </Typography>
-      <Typography>Location: {user.location}</Typography>
-      <Typography>Occupation: {user.occupation}</Typography>
-      <Typography>Description: {user.description}</Typography>
-
-      <Button
-        variant="contained"
-        component={Link}
-        to={`/photos/${user._id}`}
-      >
-        View Photos
-      </Button>
-    </div>
+    <Card>
+      <CardContent>
+        <Typography variant="h4" gutterBottom>
+          {user.first_name} {user.last_name}
+        </Typography>
+        <Typography variant="body1" color="textSecondary">
+          Location: {user.location}
+        </Typography>
+        <Typography variant="body1" color="textSecondary">
+          Occupation: {user.occupation}
+        </Typography>
+        <Typography variant="body1" paragraph style={{ marginTop: "10px" }}>
+          {user.description}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to={`/photos/${user._id}`}
+        >
+          View Photos
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
